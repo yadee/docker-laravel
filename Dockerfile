@@ -34,6 +34,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C &
 		php7.0-mbstring \
 		php7.0-zip \
 		php7.0-xml \
+		php7.0-pgsql\
 		php-mysql \
 		redis-server \
 		nodejs \
@@ -44,6 +45,9 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C &
 	mkdir /run/php && \
 	curl https://bootstrap.pypa.io/ez_setup.py -o - | python && \
 	easy_install supervisor
+#
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
 
 # Copy supervisor config files, Laravel cron file, & default site configuration
 COPY provision/conf/supervisor.conf /etc/supervisord.conf
