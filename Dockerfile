@@ -1,6 +1,6 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER LiamFiddler <design+docker@liamfiddler.com>
-
+# refer to LiamFiddler <design+docker@liamfiddler.com>
 # Set correct environment variables
 ENV HOME /root
 ENV DEBIAN_FRONTEND noninteractive
@@ -13,15 +13,17 @@ RUN sudo dpkg-reconfigure -f noninteractive tzdata
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 # Install required packages
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C && \
-	echo 'deb http://ppa.launchpad.net/ondrej/php/ubuntu trusty main' > /etc/apt/sources.list.d/ondrej-php7.list && \
-	echo 'deb http://ppa.launchpad.net/nginx/development/ubuntu trusty main' > /etc/apt/sources.list.d/nginx.list && \
-	apt-get update && apt-get install -y \
+#msphpsql
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+RUN apt-get update && apt-get install -y \
 		curl \
 		libcurl3 \
 		libcurl3-dev \
 		python \
 		cron \
+		mcrypt \
 		nano \
 		nginx \
 		php7.0-fpm \
@@ -37,6 +39,9 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C &
 		php7.0-pgsql\
 		php-mysql \
 		redis-server \
+		msodbcsql \
+		mssql-tools \
+		unixodbc-dev \
 		nodejs \
 		npm && \
 	mkdir /share && \
@@ -45,10 +50,22 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C C300EE8C &
 	mkdir /run/php && \
 	curl https://bootstrap.pypa.io/ez_setup.py -o - | python && \
 	easy_install supervisor
-#
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+RUN source ~/.bashrc
+
+RUN pear config-set php_ini `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"` system
+RUN pecl install sqlsrv
+RUN pecl install pdo_sqlsrv
+
+RUN echo "extension=sqlsrv.so" >> /etc/php/7.0/php/php.ini
+RUN echo "extension=pdo_sqlsrv.so" >> /etc/php/7.0/php/php.ini
+
+# Intall composer
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
 RUN composer config -g repo.packagist composer https://packagist.phpcomposer.com
+
 
 # Copy supervisor config files, Laravel cron file, & default site configuration
 COPY provision/conf/supervisor.conf /etc/supervisord.conf
