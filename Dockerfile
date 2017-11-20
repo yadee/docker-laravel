@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install -y \
 	easy_install supervisor
 
 #msphpsql
-RUN apt-get update && apt-get install -y apt-transport-https
+RUN apt-get update && apt-get install -y apt-transport-https wget
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN exit
@@ -53,6 +53,8 @@ RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 RUN chmod a+x ~/.bashrc
 RUN ["/bin/bash", "-c", "~/.bashrc"]
 
+RUN wget http://pear.php.net/go-pear.phar
+RUN php go-pear.phar
 RUN pear config-set php_ini `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"` system
 RUN pecl install sqlsrv
 RUN pecl install pdo_sqlsrv
