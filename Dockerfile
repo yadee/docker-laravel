@@ -47,7 +47,7 @@ RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt
 RUN exit
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get install -y msodbcsql mssql-tools 
-RUN apt-get install unixodbc-dev
+RUN apt-get -y install unixodbc-dev
 RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 RUN source ~/.bashrc
