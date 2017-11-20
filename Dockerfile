@@ -5,10 +5,6 @@ MAINTAINER LiamFiddler <design+docker@liamfiddler.com>
 ENV HOME /root
 ENV DEBIAN_FRONTEND noninteractive
 
-# Set timezone.
-RUN sudo echo "Asia/Shanghai" > /etc/timezone
-RUN sudo dpkg-reconfigure -f noninteractive tzdata
-
 # Use Supervisor to run and manage all other services
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
