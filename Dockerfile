@@ -11,7 +11,7 @@ CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 # Install required packages
 
 #msphpsql
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl apt-transport-https
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
 
