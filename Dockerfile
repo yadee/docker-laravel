@@ -9,13 +9,8 @@ ENV DEBIAN_FRONTEND noninteractive
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 # Install required packages
-
-#msphpsql
-RUN apt-get update && apt-get install -y curl apt-transport-https
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
-
 RUN apt-get update && apt-get install -y \
+		curl \
 		libcurl3 \
 		libcurl3-dev \
 		python \
@@ -36,9 +31,6 @@ RUN apt-get update && apt-get install -y \
 		php7.0-pgsql\
 		php-mysql \
 		redis-server \
-		msodbcsql \
-		mssql-tools \
-		unixodbc-dev \
 		nodejs \
 		npm && \
 	mkdir /share && \
@@ -47,6 +39,15 @@ RUN apt-get update && apt-get install -y \
 	mkdir /run/php && \
 	curl https://bootstrap.pypa.io/ez_setup.py -o - | python && \
 	easy_install supervisor
+
+#msphpsql
+RUN apt-get update && apt-get install -y apt-transport-https
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN exit
+RUN apt-get update
+RUN ACCEPT_EULA=Y apt-get install msodbcsql mssql-tools 
+RUN sudo apt-get install unixodbc-dev
 RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 RUN source ~/.bashrc
